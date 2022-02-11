@@ -3,7 +3,7 @@
 After installing the extension, 
 select Tools | Themes | Github Purple.
 
-![Csharp](art/csharp.png)
+![Csharp](.art/csharp.png)
 
 ---
 
