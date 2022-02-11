@@ -77,6 +77,8 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>GithubPurple.jsonc</DependentUpon>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\icon.png">
       <IncludeInVSIX>true</IncludeInVSIX>
