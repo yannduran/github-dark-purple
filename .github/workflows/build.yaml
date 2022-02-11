@@ -69,7 +69,6 @@ jobs:
       uses: timheuer/openvsixpublish@v1
       with:
         vsix-file: ${{ env.VsixName }}
-        readme: 'README.md'
 
   vs-marketplace:
     name: VS Marketplace
