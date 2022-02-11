@@ -21,6 +21,7 @@ jobs:
       DeployExtension: False
       VsixManifestPath: src\source.extension.vsixmanifest
       VsixManifestSourcePath: src\source.extension.cs
+      PublishManifestPath: src\publish-manifest.json
     outputs:
       version: ${{ steps.vsix_version.outputs.version-number }}
       
@@ -87,7 +88,7 @@ jobs:
       uses: cezarypiatek/VsixPublisherAction@0.1
       with:
         extension-file: ${{ env.VsixName }}
-        publish-manifest-file: 'vs-publish.json'
+        publish-manifest-file: ${{ env.PublishManifestPath }}
         personal-access-code: ${{ secrets.VS_MARKETPLACE_PAT }}
     
   github-release:
