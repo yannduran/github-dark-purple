@@ -2,7 +2,7 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
         <Identity Id="687d8010-bd44-4aad-9e83-fd3fb354c425" Version="0.1" Language="en-US" Publisher="Yann Duran" />
-        <DisplayName>Github Purple Theme</DisplayName>
+        <DisplayName>Github Dark Purple Theme</DisplayName>
         <Description xml:space="preserve">A port of the 'Github Purple' VS Code theme by 4a454646 (based on the official Github Dark theme, but with purple accents!)</Description>
         <MoreInfo>https://www.vsixgallery.com/extension/687d8010-bd44-4aad-9e83-fd3fb354c425</MoreInfo>
         <License>Resources\LICENSE</License>

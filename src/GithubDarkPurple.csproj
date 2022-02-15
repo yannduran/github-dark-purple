@@ -14,8 +14,8 @@
     <ProjectGuid>{22135824-257C-4B6B-8301-B09F20CEFC7E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GithubPurple</RootNamespace>
-    <AssemblyName>github-purple-theme</AssemblyName>
+    <RootNamespace>GithubDarkPurple</RootNamespace>
+    <AssemblyName>github-dark-purple</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
@@ -57,11 +57,10 @@
       <Link>Resources\LICENSE</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="GithubPurple.jsonc">
+    <None Include="Github Dark Purple.jsonc">
       <Generator>ThemeConverter</Generator>
-      <LastGenOutput>GithubPurple.pkgdef</LastGenOutput>
+      <LastGenOutput>Github Dark Purple.pkgdef</LastGenOutput>
     </None>
-    <None Include="publish-manifest.json" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <Generator>VsixManifestGenerator</Generator>
@@ -74,12 +73,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="GithubPurple.pkgdef">
+    <Content Include="Github Dark Purple.pkgdef">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>GithubPurple.jsonc</DependentUpon>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>Github Dark Purple.jsonc</DependentUpon>
     </Content>
     <Content Include="Resources\icon.png">
       <IncludeInVSIX>true</IncludeInVSIX>
