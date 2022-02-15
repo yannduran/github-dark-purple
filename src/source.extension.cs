@@ -12,7 +12,7 @@ namespace GithubDarkPurple
         public const string Name = "Github Dark Purple Theme";
         public const string Description = @"A port of the 'Github Purple' VS Code theme by 4a454646 (based on the official Github Dark theme, but with purple accents!)";
         public const string Language = "en-US";
-        public const string Version = "0.1";
+        public const string Version = "0.2";
         public const string Author = "Yann Duran";
         public const string Tags = "github, dark, purple, theme, yannduran, yd, luminous";
     }
