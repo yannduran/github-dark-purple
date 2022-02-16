@@ -4,13 +4,16 @@ name: "Build and Publish VSIX"
 on:
   push:
     branches: [master, develop]
-  pull_request:
-    branches: [master]
+  #pull_request:
+  #  branches: [master]
   workflow_dispatch:
-    branches: [master, develop]
+    branches: master
 
 env:
-  VsixName: ${{ github.event.repository.name }}.vsix
+  RepoName: ${{ github.event.repository.name }}
+  #IsMasterBranch: ${{ github.ref == 'refs/heads/master' }}
+  #WorkflowDispatched: ${{ github.event_name == 'workflow_dispatch' }}
+  # IsRelease: ${{ contains(github.event.head_commit.message, '[release]') }}
 
 jobs:
   build:
@@ -19,11 +22,9 @@ jobs:
     env:
       Configuration: Release
       DeployExtension: False
-      VsixManifestPath: src\source.extension.vsixmanifest
-      VsixManifestSourcePath: src\source.extension.cs
-      PublishManifestPath: src\publish-manifest.json
     outputs:
-      version: ${{ steps.vsix_version.outputs.version-number }}
+      VsixVersion: ${{ steps.increment_version.outputs.version-number }}
+      VsixFullName: ${{ env.RepoName }}_v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
       
     steps:
     - name: Checkout repo
@@ -38,57 +39,73 @@ jobs:
         vs-test: 'false'
 
     - name: Increment VSIX version
-      id: vsix_version
+      id: increment_version
       uses: timheuer/vsix-version-stamp@v1
       with:
         version-type: revision
-        manifest-file: ${{ env.VsixManifestPath }}
-        vsix-token-source-file: ${{ env.VsixManifestSourcePath }}
+        manifest-file: src\source.extension.vsixmanifest
+        vsix-token-source-file: src\source.extension.cs
+
+    - name: Print new VSIX version
+      run: echo "New version is '${{ steps.increment_version.outputs.version-number }}'"
 
     - name: Build Solution
-      run: msbuild /v:m -restore /p:OutDir=\_built
-      
-    - name: Upload VSIX artifact
+      run: msbuild /v:m -restore /p:OutDir=\_built # Configuration: Release, DeployExtension: False
+    
+  upload-artifact:
+    name: Upload VSIX artifact
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - name: Upload VSIX
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.VsixName }}
-        path: /_built/**/*.vsix
+        name: vsix-artifact
+        path: /_built/${{ needs.build.outputs.VsixFullName }}
+        if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
 
   vsix-gallery:
     name: VSIX Gallery
-    if: github.ref != 'refs/heads/master'
-    needs: build
+    if:   github.ref != 'refs/heads/master'
+    needs: [build, upload-artifact]
     runs-on: windows-latest
+    env:
+      VsixFullName: ${{ needs.build.outputs.VsixFullName }}
 
     steps:
     - name: Download VSIX artifact
       uses: actions/download-artifact@v2 
       with:
-        name: ${{ env.VsixName }}
+        name: vsix-artifact
     
+    - name: Display structure of downloaded files
+      run: ls -R
+
     - name: Upload to VSIX Gallery
       uses: timheuer/openvsixpublish@v1
       with:
-        vsix-file: ${{ env.VsixName }}
+        vsix-file: ${{ env.VsixFullName }}
 
   vs-marketplace:
     name: VS Marketplace
     if: github.ref == 'refs/heads/master'
-    needs: build
+    needs: [build, upload-artifact]
     runs-on: windows-latest
+    env:
+      VsixFullName: ${{ needs.build.outputs.VsixFullName }}
 
     steps:
     - name: Download VSIX artifact
       uses: actions/download-artifact@v2 
       with:
-        name: ${{ env.VsixName }}
+        name: ${{ env.VsixFullName }}
     
     - name: Publish extension to Marketplace
-      if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
       uses: cezarypiatek/VsixPublisherAction@0.1
       with:
-        extension-file: ${{ env.VsixName }}
-        publish-manifest-file: ${{ env.PublishManifestPath }}
+        extension-file: ${{ env.VsixFullName }}
+        publish-manifest-file: src\publish-manifest.json
         personal-access-code: ${{ secrets.VS_MARKETPLACE_PAT }}
     
   github-release:
@@ -96,18 +113,14 @@ jobs:
     if: github.ref == 'refs/heads/master'
     needs: [build, vs-marketplace]
     runs-on: windows-latest
-
-    #env:
-      #Version: ${{ needs.build.outputs.version }}
-      #ReleaseTag: v${{ Version }}
-      #ReleaseBody: Release ${{ Version }}
+    env:
+      VsixVersion: ${{ needs.build.outputs.VsixVersion }}
+      VsixFullName: ${{ needs.build.outputs.VsixFullName }}
 
     steps:
     - name: Create GitHub Release
-      if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
       uses: softprops/action-gh-release@v0.1.13
       with:
-        tag_name: v${{ needs.build.outputs.version }}
-        body: Release ${{ needs.build.outputs.version }}
-        files: |
-          **/*.vsix
+        tag_name: v${{ env.VsixVersion }}
+        body: Release ${{ env.VsixVersion }}
+        files: ${{ env.VsixFullName }}
