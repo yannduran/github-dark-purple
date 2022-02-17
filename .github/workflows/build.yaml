@@ -20,12 +20,11 @@ jobs:
     name: Build and Test
     runs-on: windows-latest
     env:
-      Configuration: Release
-      DeployExtension: False
+      VsixPath: \_built
     outputs:
-      VsixVersion: ${{ steps.increment_version.outputs.version-number }}
-      VsixFullName: ${{ env.RepoName }}_v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
-      
+      VsixVersion: ${{ steps.increment_vsix_version.outputs.version-number }}
+      VsixFullName: ${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix  
+
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
@@ -34,9 +33,9 @@ jobs:
       uses: timheuer/bootstrap-dotnet@v1
       with:
         nuget: 'false'
-        sdk: 'false'
+        sdk: 'true'
         msbuild: 'true'
-        vs-test: 'false'
+        vstest: 'false'
 
     - name: Increment VSIX version
       id: increment_vsix_version
@@ -47,34 +46,30 @@ jobs:
         vsix-token-source-file: src\source.extension.cs
 
     - name: Print new VSIX version
-      run: echo "New version is '${{ steps.increment_version.outputs.version-number }}'"
+      run: echo "New version is '${{ steps.increment_vsix_version.outputs.version-number }}'"
 
     - name: Build Solution
-      run: msbuild /v:m -restore /p:OutDir=\_built # Configuration: Release, DeployExtension: False
+      run: msbuild /v:m -restore /p:OutDir=${{ env.VsixPath }} -detailedsummary -p:Configuration=Release /p:DeployExtension=false
 
-    - name: Print _built file structure
-      run: ls -l _built/
-    
-  upload-artifact:
-    name: Upload VSIX artifact
-    needs: build
-    runs-on: windows-latest
+    - name: Rename VSIX with version
+      run: rename-item -Path ${{ env.VsixPath }}\${{ env.RepoName }}.vsix -NewName ${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
+      continue-on-error: false
 
-    steps:
-    - name: Upload VSIX
+    - name: Upload VSIX artifact
       uses: actions/upload-artifact@v2
       with:
         name: vsix-artifact
-        path: /_built/**/${{ needs.build.outputs.VsixFullName }}
-        if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
+        path: ${{ env.VsixPath }}\${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
+        if-no-files-found: error # 'warn' or 'ignore' are also available  (defaults to `warn`)
 
+    #- name: Print file structure
+    #  run: ls \_built
+    
   vsix-gallery:
     name: VSIX Gallery
     if:   github.ref != 'refs/heads/master'
-    needs: [build, upload-artifact]
+    needs: [build]
     runs-on: windows-latest
-    env:
-      VsixFullName: ${{ needs.build.outputs.VsixFullName }}
 
     steps:
     - name: Download VSIX artifact
@@ -82,32 +77,30 @@ jobs:
       with:
         name: vsix-artifact
     
-    - name: Display structure of downloaded files
-      run: ls -R
+    #- name: Display structure of downloaded files
+    #  run: ls __build
 
     - name: Upload to VSIX Gallery
       uses: timheuer/openvsixpublish@v1
       with:
-        vsix-file: ${{ env.VsixFullName }}
+        vsix-file: ${{ needs.build.outputs.VsixFullName }}
 
   vs-marketplace:
     name: VS Marketplace
     if: github.ref == 'refs/heads/master'
-    needs: [build, upload-artifact]
+    needs: [build]
     runs-on: windows-latest
-    env:
-      VsixFullName: ${{ needs.build.outputs.VsixFullName }}
 
     steps:
     - name: Download VSIX artifact
       uses: actions/download-artifact@v2 
       with:
-        name: ${{ env.VsixFullName }}
+        name: vsix-artifact
     
     - name: Publish extension to Marketplace
       uses: cezarypiatek/VsixPublisherAction@0.1
       with:
-        extension-file: ${{ env.VsixFullName }}
+        extension-file: ${{ needs.build.outputs.VsixFullName }}
         publish-manifest-file: src\publish-manifest.json
         personal-access-code: ${{ secrets.VS_MARKETPLACE_PAT }}
     
@@ -118,7 +111,6 @@ jobs:
     runs-on: windows-latest
     env:
       VsixVersion: ${{ needs.build.outputs.VsixVersion }}
-      VsixFullName: ${{ needs.build.outputs.VsixFullName }}
 
     steps:
     - name: Create GitHub Release
@@ -126,4 +118,4 @@ jobs:
       with:
         tag_name: v${{ env.VsixVersion }}
         body: Release ${{ env.VsixVersion }}
-        files: ${{ env.VsixFullName }}
+        files: ${{ needs.build.outputs.VsixFullName }}
