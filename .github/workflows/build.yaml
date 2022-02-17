@@ -39,7 +39,7 @@ jobs:
         vs-test: 'false'
 
     - name: Increment VSIX version
-      id: increment_version
+      id: increment_vsix_version
       uses: timheuer/vsix-version-stamp@v1
       with:
         version-type: revision
@@ -51,6 +51,9 @@ jobs:
 
     - name: Build Solution
       run: msbuild /v:m -restore /p:OutDir=\_built # Configuration: Release, DeployExtension: False
+
+    - name: Print _built file structure
+      run: ls -l _built/**/*.vsix
     
   upload-artifact:
     name: Upload VSIX artifact
@@ -62,7 +65,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: vsix-artifact
-        path: /_built/${{ needs.build.outputs.VsixFullName }}
+        path: /_built/**/${{ needs.build.outputs.VsixFullName }}
         if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
 
   vsix-gallery:
