@@ -11,7 +11,7 @@ on:
 
 env:
   RepoName: ${{ github.event.repository.name }}
-  #IsMasterBranch: ${{ github.ref == 'refs/heads/master' }}
+  IsMasterBranch: ${{ github.ref == 'refs/heads/master' }}
   #WorkflowDispatched: ${{ github.event_name == 'workflow_dispatch' }}
   # IsRelease: ${{ contains(github.event.head_commit.message, '[release]') }}
 
@@ -62,12 +62,9 @@ jobs:
         path: ${{ env.VsixPath }}\${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
         if-no-files-found: error # 'warn' or 'ignore' are also available  (defaults to `warn`)
 
-    #- name: Print file structure
-    #  run: ls \_built
-    
   vsix-gallery:
     name: VSIX Gallery
-    if:   github.ref != 'refs/heads/master'
+    if:  ${{ IsMasterBranch }} == false # github.ref != 'refs/heads/master'
     needs: [build]
     runs-on: windows-latest
 
@@ -77,9 +74,6 @@ jobs:
       with:
         name: vsix-artifact
     
-    #- name: Display structure of downloaded files
-    #  run: ls __build
-
     - name: Upload to VSIX Gallery
       uses: timheuer/openvsixpublish@v1
       with:
