@@ -106,7 +106,7 @@ jobs:
       with:
         name: vsix-artifact
     
-    - name: Print pwd
+    - name: List contents of current directory
       run: ls D:\a\github-dark-purple
 
     - name: Publish extension to Marketplace

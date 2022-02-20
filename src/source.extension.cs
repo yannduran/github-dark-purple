@@ -14,6 +14,6 @@ namespace GithubDarkPurple
         public const string Language = "en-US";
         public const string Version = "0.5";
         public const string Author = "Yann Duran";
-        public const string Tags = "github, dark, purple, theme, yannduran, yd, luminous";
+        public const string Tags = "github, dark, purple, theme, yannduran, yd";
     }
 }
