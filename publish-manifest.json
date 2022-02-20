@@ -2,7 +2,7 @@
   "$schema": "http://json.schemastore.org/vsix-publish",
   "categories": [ "visual studio extensions", "other" ],
   "identity": {
-    "internalName": "YannDuran.GithubDarkPurple",
+    "internalName": "GithubDarkPurple",
     "tags": [ "github", "dark", "purple", "theme", "yannduran", "yd", "luminous" ]
   },
   "priceCategory": "free",
