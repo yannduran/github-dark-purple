@@ -1,6 +1,6 @@
 ﻿A theme based on the official Github Dark theme, but with purple accents!
                
-After installing the extension, select **Tools** | **Themes** | **Github Purple**.
+After installing the extension, select **Tools** | **Themes** | **Github Dark Purple**.
 You should see something like the image below:
 
 ![Csharp](.art/csharp.png)
