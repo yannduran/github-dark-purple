@@ -100,6 +100,9 @@ jobs:
       with:
         name: vsix-artifact
     
+    - name: Print pwd
+      run: ls
+
     - name: Publish extension to Marketplace
       uses: cezarypiatek/VsixPublisherAction@0.1
       with:

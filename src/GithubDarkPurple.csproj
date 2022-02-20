@@ -61,7 +61,9 @@
       <Generator>ThemeConverter</Generator>
       <LastGenOutput>Github Dark Purple.pkgdef</LastGenOutput>
     </None>
-    <None Include="publish-manifest.json" />
+    <Content Include="publish-manifest.json">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <Generator>VsixManifestGenerator</Generator>
