@@ -11,16 +11,22 @@ on:
 
 env:
   RepoName: ${{ github.event.repository.name }}
-  IsMasterBranch: ${{ github.ref == 'refs/heads/master' }}
   #WorkflowDispatched: ${{ github.event_name == 'workflow_dispatch' }}
   # IsRelease: ${{ contains(github.event.head_commit.message, '[release]') }}
+
 
 jobs:
   build:
     name: Build and Test
     runs-on: windows-latest
     env:
-      VsixPath: \_built
+      RepoName: ${{ github.event.repository.name }} # $github.repository ? # https://bloggie.io/@_junrong/using-environment-variables-secrets-in-github-actions
+      OutputDir: \_built
+      VsixDir: $OutputDir\$RepoName
+    defaults:
+      run:
+        shell: powershell
+        #working-directory: scripts
     outputs:
       VsixVersion: ${{ steps.increment_vsix_version.outputs.version-number }}
       VsixFullName: ${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix  
@@ -49,24 +55,27 @@ jobs:
       run: echo "New version is '${{ steps.increment_vsix_version.outputs.version-number }}'"
 
     - name: Build Solution
-      run: msbuild /v:m -restore /p:OutDir=${{ env.VsixPath }} -detailedsummary -p:Configuration=Release /p:DeployExtension=false
+      run: msbuild /v:m -restore /p:OutDir=${{ env.OutputDir }} -detailedsummary -p:Configuration=Release /p:DeployExtension=false
 
     - name: Rename VSIX with version
-      run: rename-item -Path ${{ env.VsixPath }}\${{ env.RepoName }}.vsix -NewName ${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
+      run: rename-item -Path ${{ env.OutputDir }}\${{ env.RepoName }}.vsix -NewName ${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
       continue-on-error: false
 
     - name: Upload VSIX artifact
       uses: actions/upload-artifact@v2
       with:
         name: vsix-artifact
-        path: ${{ env.VsixPath }}\${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
+        path: ${{ env.OutputDir }}\${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
         if-no-files-found: error # 'warn' or 'ignore' are also available  (defaults to `warn`)
 
   vsix-gallery:
     name: VSIX Gallery
-    if:  ${{ IsMasterBranch }} == false # github.ref != 'refs/heads/master'
+    if:  github.ref != 'refs/heads/master' # ${{ IsMasterBranch }} == false
     needs: [build]
     runs-on: windows-latest
+    #env:
+      #RepoName: ${{ github.event.repository.name }}
+      #IsMasterBranch: ${{ github.ref == 'refs/heads/master' }}
 
     steps:
     - name: Download VSIX artifact
