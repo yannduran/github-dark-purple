@@ -5,10 +5,16 @@
     "internalName": "YannDuran.GithubDarkPurple",
     "tags": [ "github", "dark", "purple", "theme", "yannduran", "yd", "luminous" ]
   },
-  "overview": "readme.md",
   "priceCategory": "free",
+  "overview": "README.md",
   "publisher": "YannDuran",
+  "repo": "https://github.com/yannduran/github-dark-purple-theme",
   "private": false,
   "qna": false,
-  "repo": "https://github.com/yannduran/github-dark-purple-theme"
+  "assetFiles": [
+    {
+      "pathOnDisk": "art/csharp.png",
+      "targetPath": "art/csharp.png"
+    }
+  ]
 }
