@@ -62,7 +62,7 @@
       <LastGenOutput>Github Dark Purple.pkgdef</LastGenOutput>
     </None>
     <Content Include="publish-manifest.json">
-      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>

@@ -61,11 +61,16 @@ jobs:
       run: rename-item -Path ${{ env.OutputDir }}\${{ env.RepoName }}.vsix -NewName ${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
       continue-on-error: false
 
+    - name: List output directory contents
+      run: ls ${{ env.OutputDir }}
+
     - name: Upload VSIX artifact
       uses: actions/upload-artifact@v2
       with:
         name: vsix-artifact
-        path: ${{ env.OutputDir }}\${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
+        path: |
+          ${{ env.OutputDir }}\${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
+          ${{ env.OutputDir }}\publish-manifest.json
         if-no-files-found: error # 'warn' or 'ignore' are also available  (defaults to `warn`)
 
   vsix-gallery:
@@ -107,7 +112,7 @@ jobs:
       uses: cezarypiatek/VsixPublisherAction@0.1
       with:
         extension-file: ${{ needs.build.outputs.VsixFullName }}
-        publish-manifest-file: src\publish-manifest.json
+        publish-manifest-file: publish-manifest.json
         personal-access-code: ${{ secrets.VS_MARKETPLACE_PAT }}
     
   github-release:
