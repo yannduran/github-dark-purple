@@ -70,7 +70,6 @@ jobs:
         name: vsix-artifact
         path: |
           ${{ env.OutputDir }}\${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix
-          ${{ env.OutputDir }}\publish-manifest.json
         if-no-files-found: error # 'warn' or 'ignore' are also available  (defaults to `warn`)
 
   vsix-gallery:
@@ -106,7 +105,7 @@ jobs:
         name: vsix-artifact
     
     - name: Print pwd
-      run: ls
+      run: ls D/a
 
     - name: Publish extension to Marketplace
       uses: cezarypiatek/VsixPublisherAction@0.1
