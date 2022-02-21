@@ -11,6 +11,7 @@ on:
 
 env:
   RepoName: ${{ github.event.repository.name }}
+  Debugging: true
   #WorkflowDispatched: ${{ github.event_name == 'workflow_dispatch' }}
   # IsRelease: ${{ contains(github.event.head_commit.message, '[release]') }}
 
@@ -32,6 +33,7 @@ jobs:
 
     steps:
     - name: Dump Github context
+      if: env.Debugging
       run: echo "$GITHUB_CONTEXT"
 
     - name: Checkout repo
@@ -54,6 +56,7 @@ jobs:
         vsix-token-source-file: src\source.extension.cs
 
     - name: Print new VSIX version
+      if: env.Debugging
       run: echo "New version is '${{ steps.increment_vsix_version.outputs.version-number }}'"
 
     - name: Build Solution
@@ -64,6 +67,7 @@ jobs:
       continue-on-error: false
 
     - name: List output directory contents
+      if: env.Debugging
       run: ls ${{ env.OutputDir }}
 
     - name: Upload VSIX artifact
@@ -109,6 +113,7 @@ jobs:
         name: vsix-artifact
     
     - name: List contents of current directory
+      if: env.Debugging
       run: ls D:\a\github-dark-purple
 
     - name: Publish extension to Marketplace
