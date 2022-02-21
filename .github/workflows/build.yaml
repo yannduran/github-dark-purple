@@ -7,13 +7,12 @@ on:
   #pull_request:
   #  branches: [master]
   workflow_dispatch:
-    branches: master
+    branches: [ master ]
 
 env:
   RepoName: ${{ github.event.repository.name }}
   #WorkflowDispatched: ${{ github.event_name == 'workflow_dispatch' }}
   # IsRelease: ${{ contains(github.event.head_commit.message, '[release]') }}
-
 
 jobs:
   build:
@@ -32,6 +31,9 @@ jobs:
       VsixFullName: ${{ env.RepoName }}-v${{ steps.increment_vsix_version.outputs.version-number }}.vsix  
 
     steps:
+    - name: Dump Github context
+      run: echo "$GITHUB_CONTEXT"
+
     - name: Checkout repo
       uses: actions/checkout@v2
 
